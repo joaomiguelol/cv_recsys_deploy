@@ -1,2 +1,0 @@
-# Dempy Client
--e git+ssh://git@git.fraunhofer.pt/demrepo/dataset-control-library-python.git#egg=dempy

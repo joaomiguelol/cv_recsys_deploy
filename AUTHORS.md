@@ -4,7 +4,7 @@ Credits
 Project Lead
 ----------------
 
-* joao.miguel <joao.miguel@fraunhofer.pt>
+* joao.miguel <joaomigueloliveira30@gmail.com.pt>
 
 Project Contributors
 ------------
