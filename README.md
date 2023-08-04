@@ -27,7 +27,7 @@ You will need:
 
 Clone this repository
 
-    git clone --recursive ssh://git@git.fraunhofer.pt/recsys23/recsys23.git
+    git clone --recursive 
     cd recsys23 && git init
 
 Install dependencies
@@ -80,7 +80,7 @@ If you publish work that uses recsys23, please cite recsys23 as follows:
 
 ```bibtex
 @misc{recsys23 recsys23,
-  author = {Fraunhofer AICOS},
+  author = {Joao Miguel de Almeida Oliveira},
   title = {A short description of the project. No quotes.},
   year = {2023},
 }
