@@ -1,0 +1,114 @@
+version: '3.8'
+services:
+  merlin:
+    build: 
+      context: .       # The path to the directory containing the Dockerfile
+      dockerfile: Dockerfile 
+    image: nvcr.io/nvidia/merlin/merlin-tensorflow:nightly
+    runtime: nvidia
+    command: /bin/bash
+    ports:
+      - "8888:8888"
+      - "8797:8787"
+      - "8796:8786"
+    ipc: host
+    cap_add:
+      - SYS_NICE
+    stdin_open: true
+    tty: true
+    volumes:
+      - "./:/workspace"
+    restart: "no"
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: "/workspace/src/recsys23:${PYTHONPATH}"
+    networks:
+      - public
+      - internal
+
+  s3:
+    image: minio/minio:RELEASE.2021-11-24T23-19-33Z
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET_ACCESS_KEY}
+    command: server /data --console-address ":9001"
+    networks:
+      - internal
+      - public
+    volumes:
+      - ./mlflow-docker/minio_volume:/data
+
+  db:
+    image: mysql/mysql-server:5.7.28
+    restart: unless-stopped
+    container_name: mlflow_db
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./mlflow-docker/db_volume:/var/lib/mysql
+    networks:
+      - internal
+      - public
+
+
+  mlflow:
+    container_name: tracker_mlflow
+    image: tracker_ml
+    restart: unless-stopped
+    build:
+      context: ./mlflow-docker/mlflow
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_REGION}
+      - MLFLOW_S3_ENDPOINT_URL=http://172.21.0.2:9000
+    networks:
+      - public
+      - internal
+    entrypoint: mlflow server --backend-store-uri mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE} --default-artifact-root 172.21.0.2://${AWS_BUCKET_NAME}/ --artifacts-destination 172.21.0.2://${AWS_BUCKET_NAME}/ -h 0.0.0.0
+    depends_on:
+      wait-for-db:
+        condition: service_completed_successfully
+  
+  create_s3_buckets:
+    image: minio/mc
+    depends_on:
+      - "s3"
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc alias set minio http://s3:9000 '${AWS_ACCESS_KEY_ID}' '${AWS_SECRET_ACCESS_KEY}') do echo '...waiting...' && sleep 1; done;
+      /usr/bin/mc mb minio/${AWS_BUCKET_NAME};
+      exit 0;
+      "
+    networks:
+      - internal
+
+  wait-for-db:
+    image: atkrad/wait4x
+    depends_on:
+      - db
+    command: tcp db:3306 -t 90s -i 250ms
+    networks:
+      - internal
+
+networks:
+  internal:
+  public:
+    driver: bridge
+    
+volumes:
+  db_volume:
+  minio_volume:

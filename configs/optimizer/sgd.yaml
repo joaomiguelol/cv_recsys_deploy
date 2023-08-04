@@ -1,0 +1,3 @@
+lr: 1e-3
+momentum: 0.99
+type: sgd

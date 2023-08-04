@@ -1,0 +1,5 @@
+# https://mlflow.org
+project_name: recsys23
+experiment_name: recsys-tests
+mlflow:
+  experiment_name: "experiment"

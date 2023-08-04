@@ -1,0 +1,2 @@
+data:
+  root_path: ${hydra:runtime.cwd}/data/

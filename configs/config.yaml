@@ -1,0 +1,24 @@
+hydra:
+  help:
+    template:
+      'This is the help message'
+  sweep:
+    dir: logs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  run:
+    dir: logs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+settings:
+  seed: 42
+
+params:
+  epochs: 10
+  batch_size: 40
+
+# specify here default training configuration
+defaults:
+  - _self_
+  - logger: mlflow
+  - optimizer: sgd
+  - model: classifier
+  - dataset: default

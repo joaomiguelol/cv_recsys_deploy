@@ -1,0 +1,11 @@
+# This file contains values from Cookiecutter
+
+default_context:
+  project_name: "recsys23"
+  repo_name: "recsys23"
+  description: "A short description of the project. No quotes."
+  organization: "Fraunhofer AICOS"
+  license: "No license"
+  organization_email: "no-reply@fraunhofer.pt"
+  line_length: "120"
+  python_minimal_version: "3.7"
