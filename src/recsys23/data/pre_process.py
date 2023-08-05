@@ -26,7 +26,7 @@ class Pre_process:
         customers.to_parquet(os.path.join(config.data_processed_dir,'customers_enc.parquet'))
         transactions.to_parquet(os.path.join(config.data_processed_dir,'transactions_enc.parquet'))
     
-    def split_based_on_time(self,train_start = 60,valid_start= 90,test_start = 100,test_end = 104):
+    def split_based_on_time(self,train_start = 50,valid_start= 90,test_start = 100,test_end = 104):
 
         transactions = pd.read_parquet(os.path.join(config.data_processed_dir,'transactions_enc.parquet'))
 
@@ -67,4 +67,4 @@ class Pre_process:
         print('\n\ntrain shape: ', train.shape)
         print('valid shape: ', valid.shape)
         print('test shape: ', test.shape)
-
+    

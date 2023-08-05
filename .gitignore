@@ -106,7 +106,7 @@ target/
 **/.vscode
 # Local History for Visual Studio Code
 .history/
-
+.metaflow/
 # Spyder
 .spyderproject
 .spyproject/

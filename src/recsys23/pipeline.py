@@ -3,10 +3,10 @@ import config
 import pandas as pd
 import os
 from data.pre_process import Pre_process
+from features.feature_eng import Feature_eng
+from models.train import two_tower_model
+import tensorflow as tf
 class Recsys23(FlowSpec):
-    
-
-
 
 
     @step
@@ -14,7 +14,9 @@ class Recsys23(FlowSpec):
         """
         Start the flow by running the first step.
         """
-        self.next(self.read_data)
+        self.print_stats = True
+        self.save_data = True
+        self.next(self.preprocess_data)
 
     @step
     def preprocess_data(self):
@@ -24,11 +26,17 @@ class Recsys23(FlowSpec):
 
         pre_process = Pre_process()
         pre_process.read_data()
-        self.train,self.valid,self.test = pre_process.split_based_on_time()
+        self.train, self.valid, self.test = pre_process.split_based_on_time()
         
         if self.print_stats:
             pre_process.print_stats(self.train,self.valid,self.test)
 
+        self.next(self.feature_eng)
+
+    @step
+    def feature_eng(self):
+        feature_eng = Feature_eng()
+        self.train, self.valid, self.test = feature_eng.baseline(self.train,self.valid,self.test, self.save)
         self.next(self.train_model)
 
     @step
@@ -36,13 +44,13 @@ class Recsys23(FlowSpec):
         '''
         Train the model
         '''
-        pass
-    @step
-    def evaluate_model(self):
-        '''
-        Evaluate the model
-        '''
-        pass
+        model = two_tower_model(self.train, self.valid, self.test)
+        model.define_model_configs()
+        model.fit()
+        model.evaluate()
+
+        self.next(self.end)
+
     @step
     def end(self):
         '''
