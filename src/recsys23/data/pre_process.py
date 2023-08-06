@@ -2,11 +2,12 @@ import pandas as pd
 import os
 import config
 from sklearn.preprocessing import LabelEncoder
-
+import mlflow
 class Pre_process:
 
-    def __init__(self):
-        pass
+    def __init__(self, mlflow):
+        self.mlflow = mlflow
+
 
     def read_data(self):
         """
@@ -47,11 +48,10 @@ class Pre_process:
     def print_stats(self,train,valid,test):
         common = set(train['customer_id']).intersection(set(valid['customer_id']))
         common_items = set(train['article_id']).intersection(set(valid['article_id']))
-
+        
         print('Number of common customers in train and valid: ', len(common))
         print('Number of common customers in train and test: ', len(set(train['customer_id']).intersection(set(test['customer_id']))))
         print('Number of common customers in valid and test: ', len(set(valid['customer_id']).intersection(set(test['customer_id']))))
-
 
 
         print('Number of common items between train and valid: ', len(common_items))
@@ -67,4 +67,20 @@ class Pre_process:
         print('\n\ntrain shape: ', train.shape)
         print('valid shape: ', valid.shape)
         print('test shape: ', test.shape)
-    
+
+        mlflow.log_param('Number of common customers in train and valid ', len(common))
+        mlflow.log_param('Number of common customers in train and test ', len(set(train['customer_id']).intersection(set(test['customer_id']))))
+        mlflow.log_param('Number of common customers in valid and test ', len(set(valid['customer_id']).intersection(set(test['customer_id']))))
+        mlflow.log_param('Number of common items between train and valid ', len(common_items))
+        mlflow.log_param('Number of customers in train ', len(train['customer_id'].unique()))
+        mlflow.log_param('Number of customers in valid ', len(valid['customer_id'].unique()))
+        mlflow.log_param('Number of items in train ', len(train['article_id'].unique()))
+        mlflow.log_param('Number of items in valid', len(valid['article_id'].unique()))
+        mlflow.log_param('Number of customers in valid but not in train ', len(set(valid['customer_id']) - set(train['customer_id'])))
+        mlflow.log_param('Number of customers in train but not in test', len(set(train['customer_id']) - set(test['customer_id'])))
+        mlflow.log_param('Number of items in valid but not in train ', len(set(valid['article_id']) - set(train['article_id'])))
+        mlflow.log_param('train shape ', train.shape)
+        mlflow.log_param('valid shape ', valid.shape)
+        mlflow.log_param('test shape ', test.shape)
+
+
