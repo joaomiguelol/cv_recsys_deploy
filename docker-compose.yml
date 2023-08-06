@@ -74,7 +74,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_DEFAULT_REGION=${AWS_REGION}
-      - MLFLOW_S3_ENDPOINT_URL=http://172.21.0.2:9000
+      - MLFLOW_S3_ENDPOINT_URL=http://s3:9000
     networks:
       - public
       - internal
