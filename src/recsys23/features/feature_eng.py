@@ -36,4 +36,6 @@ class Feature_eng():
             valid.to_parquet(os.path.join(config.data_final, 'validation_processed'))
             test.to_parquet(os.path.join(config.data_final, 'test_processed'))
         
-        return train, valid, test
+        artifats = {}
+        artifats['features'] = features.graph
+        return train, valid, test, artifats

@@ -4,11 +4,14 @@ import pandas as pd
 import os
 from data.pre_process import Pre_process
 from features.feature_eng import Feature_eng
-from models.train import two_tower_model
+from models.train import Two_tower_model
 import tensorflow as tf
 import mlflow
-class Recsys23(FlowSpec):
 
+
+
+
+class Recsys23(FlowSpec):
 
     @step
     def start(self):
@@ -17,8 +20,9 @@ class Recsys23(FlowSpec):
         """
         self.print_stats = True
         self.save_data = True
-        mlflow.set_experiment('merlin_models')
-        self.mlflow_run = mlflow.start_run()
+        self.parameters = {}
+        self.artifacts = {}
+        self.metrics = {}
         self.next(self.preprocess_data)
         
 
@@ -27,32 +31,38 @@ class Recsys23(FlowSpec):
         '''
         Preprocess the data
         '''
-
-        pre_process = Pre_process(self.mlflow_run )
+        pre_process = Pre_process()
         pre_process.read_data()
         self.train, self.valid, self.test = pre_process.split_based_on_time()
         
         if self.print_stats:
-            pre_process.print_stats(self.train,self.valid,self.test)
+            config = pre_process.print_stats(self.train,self.valid,self.test)
+            self.parameters.update(config)
 
         self.next(self.feature_eng)
 
     @step
     def feature_eng(self):
         feature_eng = Feature_eng()
-        self.train, self.valid, self.test = feature_eng.baseline(self.train,self.valid,self.test, self.save_data)
+        self.train, self.valid, self.test, artifacts = feature_eng.baseline(self.train,self.valid,self.test, self.save_data)
+        
+        self.artifacts.update(artifacts)
         self.next(self.train_model)
 
+    # run with gpu
     @step
     def train_model(self):
         '''
         Train the model
         '''
-        model = two_tower_model(self.train, self.valid, self.test, self.mlflow_run )
-        model.define_model_configs()
-        model.fit()
-        model.evaluate()
 
+        model = Two_tower_model(self.train, self.valid, self.test)
+        model.define_model_configs()
+        history = model.fit()
+        metrics = model.evaluate()
+        self.metrics.update(metrics)
+        self.metrics.update(history)
+        # self.artifacts.update(model.model)
         self.next(self.end)
 
     @step
@@ -60,8 +70,19 @@ class Recsys23(FlowSpec):
         '''
         End the flow
         '''
-        mlflow.end_run()
-        pass
+        mlflow.set_experiment('merlin')
+        with mlflow.start_run(run_name="Two_tower"):
+            mlflow.log_params(self.parameters)
+            # mlflow.log_artifacts(self.artifacts)
+            # mlflow.log_metrics(self.metrics)
+            for metric_name, metric_values in self.metrics.items():
+             # Use the index-based names for metrics with multiple values (e.g., loss_0, loss_1)
+                if isinstance(metric_values, list):
+                    for idx, value in enumerate(metric_values):
+                        mlflow.log_metric(metric_name, value)
+                else:
+                    mlflow.log_metric(metric_name, metric_values)
 if __name__ == '__main__':
+
     teste = Recsys23()
 
