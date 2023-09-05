@@ -122,6 +122,7 @@ notebook/.ipynb_checkpoints
 data/processed/
 data/interim/
 data/external/
+data/final/
 data/raw/
 models/
 test/data

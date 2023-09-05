@@ -4,7 +4,8 @@ services:
     build: 
       context: .       # The path to the directory containing the Dockerfile
       dockerfile: Dockerfile 
-    image: nvcr.io/nvidia/merlin/merlin-tensorflow:nightly
+    # image: nvcr.io/nvidia/merlin/merlin-tensorflow:nightly
+    image: nvcr.io/nvidia/merlin/merlin-pytorch:nightly
     runtime: nvidia
     command: /bin/bash
     ports:
