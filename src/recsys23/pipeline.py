@@ -7,17 +7,18 @@ from features.feature_eng import Feature_eng
 from models.train import Two_tower_model
 import tensorflow as tf
 import mlflow
-
+import json
 
 
 
 class Recsys23(FlowSpec):
-
     @step
     def start(self):
         """
         Start the flow by running the first step.
         """
+        config_path = os.path.join(config.configs_dir, 'config.json')
+        self.configs = json.load(open('config.json'))
         self.print_stats = True
         self.save_data = True
         self.parameters = {}
@@ -84,5 +85,7 @@ class Recsys23(FlowSpec):
                     mlflow.log_metric(metric_name, metric_values)
 if __name__ == '__main__':
 
-    teste = Recsys23()
+    # Run the Metaflow flow with Hydra
+    with hydra.initialize_config_module(config_module="your_config_module"):
+        hydra.main(config_name="config")(Recsys23)()
 
