@@ -117,7 +117,7 @@ ipython_config.py
 
 # Jupyter Notebook Checkpoints
 notebook/.ipynb_checkpoints
-
+notebooks/tmp/
 # exclude data from source control by default
 data/processed/
 data/interim/
