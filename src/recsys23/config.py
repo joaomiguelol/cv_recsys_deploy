@@ -47,6 +47,9 @@ data_processed_dir = join(project_dir, _data_processed_dir)
 _data_final = Path(str(getenv("DIR_DATA_FINAL")))
 data_final= join(project_dir, _data_final)
 
+_data_imgs = Path(str(getenv("DIR_DATA_IMGS")))
+data_imgs= join(project_dir, _data_imgs)
+
 delta_table_dir = Path(str(getenv("DELTA_TABLE_PATH")))
 
 # CUDA Enable
