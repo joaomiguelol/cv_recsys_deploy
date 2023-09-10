@@ -20,6 +20,9 @@ dotenv.load_dotenv(secrets_path, override=True)
 _reports_dir = Path(str(getenv("DIR_REPORTS")))
 report_dir = join(project_dir, _reports_dir)
 
+_configsdir = Path(str(getenv("DIR_CONFIGS")))
+configs_dir = join(project_dir, _configsdir)
+
 _figures_dir = Path(str(getenv("DIR_FIGURES")))
 figures_dir = join(project_dir, _figures_dir)
 
@@ -40,8 +43,12 @@ data_interim_dir = join(project_dir, _data_interim_dir)
 
 _data_processed_dir = Path(str(getenv("DIR_DATA_PROCESSED")))
 data_processed_dir = join(project_dir, _data_processed_dir)
+
 _data_final = Path(str(getenv("DIR_DATA_FINAL")))
 data_final= join(project_dir, _data_final)
+
+_data_imgs = Path(str(getenv("DIR_DATA_IMGS")))
+data_imgs= join(project_dir, _data_imgs)
 
 delta_table_dir = Path(str(getenv("DELTA_TABLE_PATH")))
 
